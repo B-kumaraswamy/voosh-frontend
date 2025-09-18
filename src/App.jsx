@@ -1,27 +1,28 @@
 // src/App.jsx
-import React, { useEffect, useState } from 'react';
-import Sidebar from './components/Sidebar/Sidebar';
-import ChatWindow from './components/ChatWindow';
-import './styles/main.scss';
+import { useEffect, useState } from "react";
+import ChatWindow from "./components/ChatWindow";
+import Sidebar from "./components/Sidebar/Sidebar";
+import "./styles/main.scss";
 
 export default function App() {
   // sessions: array of { id, createdAt, messagesCount, updatedAt, title? }
   const [sessions, setSessions] = useState([]);
   const [selectedSessionId, setSelectedSessionId] = useState(
-    localStorage.getItem('sessionId') || null
+    localStorage.getItem("sessionId") || null
   );
+  const BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
 
   useEffect(() => {
-    if (selectedSessionId) localStorage.setItem('sessionId', selectedSessionId);
-    else localStorage.removeItem('sessionId');
+    if (selectedSessionId) localStorage.setItem("sessionId", selectedSessionId);
+    else localStorage.removeItem("sessionId");
   }, [selectedSessionId]);
 
   // fetch sessions list (from backend) on mount
   useEffect(() => {
     (async () => {
       try {
-        const r = await fetch('/sessions');
-        if (!r.ok) throw new Error('Failed to fetch sessions');
+        const r = await fetch(`${BASE}/sessions`);
+        if (!r.ok) throw new Error("Failed to fetch sessions");
         const list = await r.json();
         setSessions(Array.isArray(list) ? list : []);
         // if no selectedSessionId, select first (if any)
@@ -29,7 +30,7 @@ export default function App() {
           setSelectedSessionId(list[0].id);
         }
       } catch (e) {
-        console.warn('Could not load sessions:', e.message || e);
+        console.warn("Could not load sessions:", e.message || e);
         setSessions([]); // fallback to empty
       }
     })();
@@ -40,8 +41,10 @@ export default function App() {
   // Add a session (optimistic if backend not available)
   const createSession = async () => {
     try {
-      const resp = await fetch('/sessions', { method: 'POST' });
-      if (!resp.ok) throw new Error('create session failed');
+      const resp = await fetch(`${BASE}/sessions`, {
+        method: "POST",
+      });
+      if (!resp.ok) throw new Error("create session failed");
       const data = await resp.json();
       const newSession = {
         id: data.id,
@@ -63,7 +66,10 @@ export default function App() {
       };
       setSessions((s) => [newSession, ...s]);
       setSelectedSessionId(newSession.id);
-      console.warn('Session API create failed - using local session', e.message || e);
+      console.warn(
+        "Session API create failed - using local session",
+        e.message || e
+      );
       return newSession;
     }
   };
@@ -75,14 +81,19 @@ export default function App() {
       setSelectedSessionId(null);
     }
     try {
-      await fetch(`/sessions/${encodeURIComponent(id)}`, { method: 'DELETE' });
+      await fetch(`${BASE}/sessions/${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      });
     } catch (e) {
-      console.warn('Failed to delete session on server', e.message || e);
+      console.warn("Failed to delete session on server", e.message || e);
     }
   };
 
   // Called by ChatWindow when messages change (so sidebar can update counts)
-  const patchSessionMessages = (sessionId, { deltaCount = 0, updatedAt = Date.now() }) => {
+  const patchSessionMessages = (
+    sessionId,
+    { deltaCount = 0, updatedAt = Date.now() }
+  ) => {
     setSessions((prev) =>
       prev.map((s) => {
         if (s.id !== sessionId) return s;
@@ -99,13 +110,15 @@ export default function App() {
   const replaceSession = (sessionId, newSessionFields) => {
     setSessions((prev) => {
       const found = prev.find((p) => p.id === sessionId);
-      if (!found) return [ { id: sessionId, ...newSessionFields }, ...prev ];
-      return prev.map((p) => (p.id === sessionId ? { ...p, ...newSessionFields } : p));
+      if (!found) return [{ id: sessionId, ...newSessionFields }, ...prev];
+      return prev.map((p) =>
+        p.id === sessionId ? { ...p, ...newSessionFields } : p
+      );
     });
   };
 
   return (
-    <div className="app-root" style={{ display: 'flex', height: '100vh' }}>
+    <div className="app-root" style={{ display: "flex", height: "100vh" }}>
       <Sidebar
         sessions={sessions}
         selectedSessionId={selectedSessionId}
@@ -116,8 +129,12 @@ export default function App() {
       <main style={{ flex: 1 }}>
         <ChatWindow
           sessionId={selectedSessionId}
-          onMessagesChange={(patch) => patchSessionMessages(selectedSessionId, patch)}
-          replaceSession={(fields) => selectedSessionId && replaceSession(selectedSessionId, fields)}
+          onMessagesChange={(patch) =>
+            patchSessionMessages(selectedSessionId, patch)
+          }
+          replaceSession={(fields) =>
+            selectedSessionId && replaceSession(selectedSessionId, fields)
+          }
         />
       </main>
     </div>
