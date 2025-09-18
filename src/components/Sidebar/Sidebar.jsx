@@ -5,10 +5,12 @@ export default function Sidebar({ selectedSessionId, onSelect }) {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
+
   async function loadSessions() {
     setLoading(true);
     try {
-      const r = await fetch('/sessions');
+      const r = await fetch(`${BASE}/sessions`, { method: 'GET' });
       if (!r.ok) throw new Error('Failed to load sessions');
       const j = await r.json();
       setSessions(j.result || []);
@@ -26,7 +28,7 @@ export default function Sidebar({ selectedSessionId, onSelect }) {
 
   async function handleNew() {
     try {
-      const r = await fetch('/sessions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
+      const r = await fetch(`${BASE}/sessions`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
       if (!r.ok) throw new Error('Create session failed');
       const j = await r.json();
       const id = j.id;
@@ -42,7 +44,7 @@ export default function Sidebar({ selectedSessionId, onSelect }) {
   async function handleDelete(id) {
     if (!confirm('Delete this chat?')) return;
     try {
-      const r = await fetch(`/sessions/${id}`, { method: 'DELETE' });
+      const r = await fetch(`${BASE}/sessions/${id}`, { method: 'DELETE' });
       if (!r.ok) throw new Error('delete failed');
       await loadSessions();
       // if deleted session was selected, clear selection
