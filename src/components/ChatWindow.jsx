@@ -21,6 +21,8 @@ export default function ChatWindow({ sessionId }) {
   const containerRef = useRef();
   const streamingAbortController = useRef(null);
 
+  const BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+
   // load session messages when sessionId changes
   useEffect(() => {
     let cancelled = false;
@@ -31,7 +33,7 @@ export default function ChatWindow({ sessionId }) {
       }
       try {
         const resp = await axios.get(
-          `/sessions/${encodeURIComponent(sessionId)}/messages`
+          `${BASE}/sessions/${encodeURIComponent(sessionId)}/messages`
         );
         const j = resp.data;
         if (cancelled) return;
@@ -122,7 +124,7 @@ export default function ChatWindow({ sessionId }) {
     streamingAbortController.current = ac;
 
     try {
-      const resp = await fetch("/chat", {
+      const resp = await fetch(`${BASE}/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sessionId, message: text, stream: true }),
