@@ -1,0 +1,38 @@
+.sidebar {
+  width: 260px;
+  background: linear-gradient(180deg,#041225,#031026);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #cfe7ff;
+}
+
+.sidebar-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.sessions-list { overflow:auto; padding-top:4px; }
+
+.session-item {
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  align-items:center;
+  padding:8px;
+  border-radius:8px;
+  cursor:pointer;
+  margin-bottom:6px;
+}
+.session-item:hover { background: rgba(255,255,255,0.02); }
+.session-item.active { background: rgba(0,120,255,0.08); }
+
+.session-title { font-weight:600; font-size:14px; color:#fff; }
+.session-sub { font-size:12px; color: #9fb6d1; }
+
+.btn.small { padding:6px 8px; font-size:13px; }
+.btn.danger { background: #7a1f1f; }
+.muted { color:#93a6bc; font-size:13px; }
+.error { color:#ff7b7b; font-size:13px; margin-bottom:6px; }
