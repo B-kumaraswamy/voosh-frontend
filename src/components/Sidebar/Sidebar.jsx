@@ -62,9 +62,10 @@ export default function Sidebar({ selectedSessionId, onSelect }) {
         <button onClick={handleNew}>New</button>
       </div>
       <div style={{ marginTop: 12 }}>
-        {loading && <div style={{ color: '#888' }}>Loading...</div>}
+        {loading && <div style={{ color: '#888' }}>Loading... <span className="spinner" /></div>}
+         
         {!loading && sessions.length === 0 && <div style={{ color: '#666' }}>No chats</div>}
-        {sessions.map((s) => (
+        {sessions.map((s, index) => (
           <div key={s.id} style={{ marginBottom: 12 }}>
             <div
               onClick={() => onSelect(s.id)}
@@ -76,8 +77,8 @@ export default function Sidebar({ selectedSessionId, onSelect }) {
                 color: '#fff'
               }}
             >
-              <div style={{ fontWeight: 'bold' }}>{s.title}</div>
-              {/* <div style={{ fontSize: 12, color: '#aab' }}>{(s.msgCount || 0)} msgs • {new Date(s.createdAt).toLocaleString()}</div> */}
+              <div style={{ fontWeight: 'bold' }}>Chat {sessions.length - index} , 💬 {(s.msgCount || 0)} msgs </div>
+             
             </div>
             <div style={{ marginTop: 6 }}>
               <button onClick={() => handleDelete(s.id)} style={{ color: 'white', background: '#b33' }}>Delete</button>
